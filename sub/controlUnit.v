@@ -21,7 +21,8 @@ module controlUnit(
     output reg DEC,
     output reg [15:0] IMMEDIATE,
     output reg CARRY_UPD,
-    output reg [1:0] ALU_CIN_SEL
+    output reg [1:0] ALU_CIN_SEL,
+    output reg PC_HOLD
 );
     wire [3:0] OPCODE = INSTRUCTION[15:12];
     reg [3:0] Rbase;
@@ -122,6 +123,9 @@ module controlUnit(
                 WADDR = INSTRUCTION[11:9];
                 WRITE = 1'b1;
                 REG_WRITEBACK_SEL = 2'b11;
+            end
+            4'he: begin // 1010 HALT
+                PC_HOLD = 1'b1;
             end
             default: ; // 1001, 1010, 1011, 1100, 1101, 1110, 1111 INVALID
         endcase

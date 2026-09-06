@@ -29,6 +29,7 @@ module Core(
     wire [1:0] REG_WRITEBACK_SEL;
     wire ALU_B_SEL;
     wire RAM_DIN_SEL;
+    wire PC_HOLD;
 
     reg [15:0] RAM_ADDR;
     reg [15:0] REG_WRITEBACK;
@@ -74,7 +75,7 @@ module Core(
 
     fetch fetch_inst(
         .CLK(CLK), .PC_CLEAR(RESET), .SH_BRANCH(SH_BRANCH),
-        .IR_CLEAR(RESET), .BRANCH_TGT(BRANCH_TGT_MUX),
+        .IR_CLEAR(RESET), .BRANCH_TGT(BRANCH_TGT_MUX), .PC_HOLD(PC_HOLD),
         .INSTRUCTION(INSTRUCTION), .NEXT_PC(NEXT_PC)
     );
 
@@ -110,7 +111,7 @@ module Core(
         .ALU_B_SEL(ALU_B_SEL), .IN_ENABLE(IN_ENABLE), .OUT_ENABLE(OUT_ENABLE),
         .RAM_ADDR_SEL(RAM_ADDR_SEL), .RAM_DIN_SEL(RAM_DIN_SEL), .INC(INC),
         .DEC(DEC), .IMMEDIATE(IMMEDIATE), .CARRY_UPD(CARRY_UPD),
-        .ALU_CIN_SEL(ALU_CIN_SEL)
+        .ALU_CIN_SEL(ALU_CIN_SEL), .PC_HOLD(PC_HOLD)
     );
 
     assign BRANCH_TGT_MUX = RET ? RAM_OUT : BRANCH_TGT_RAW;

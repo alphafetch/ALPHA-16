@@ -26,8 +26,9 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `0111` | MOVI | `Rd` | `imm[8:6]` | `imm[5:3]` | `imm[2:0]` |
 | `1000` | BNE | `Rcond` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
 | `1001` | NOT | `Rd[11:9]` | `Rs1[8:6]` | - | - |
+| `1010` | HALT | - | - | - | - |
 
-### ALU Select (R-type Mnemonic)
+### ALU Select (R-type)
 | Value | Operation |
 | --- | --- |
 | `000` | ADD |

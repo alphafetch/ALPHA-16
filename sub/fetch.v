@@ -4,6 +4,7 @@ module fetch(
     input SH_BRANCH,
     input IR_CLEAR,
     input [15:0] BRANCH_TGT,
+    input PC_HOLD,
     
     output reg [15:0] INSTRUCTION,
     output reg [7:0] NEXT_PC
@@ -20,7 +21,8 @@ module fetch(
         if (PC_CLEAR) begin
             PC <= 8'h00;
             NEXT_PC <= 8'h00;
-        end else if (SH_BRANCH) begin
+        end else if (PC_HOLD) PC <= PC;
+        else if (SH_BRANCH) begin
             PC <= BRANCH_TGT[7:0];
             NEXT_PC <= PC + 1;
         end else begin
