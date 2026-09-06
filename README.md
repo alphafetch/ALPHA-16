@@ -13,8 +13,8 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 - 8-bit ROM with up to 256 instructions
 - Carry flag for 32-bit addition (explained below)
 
-## ISA
-| Opcode | Hex | Mnemonic | [11:9] | [8:6] | [5:3] | [2:0] |
+## Instruction Set
+| Opcode | Hex | Mnemonic | `[11:9]` | `[8:6]` | `[5:3]` | `[2:0]` |
 | --- | --- | --- | --- | --- | --- | --- |
 | `0000` | `0xxx` | R-type | `ALUSel` | `Rd` | `Rs1` | `Rs2` |
 | `0001` | `1xxx` | LOAD | `Rd` | `Rbase` | - | - |
@@ -46,7 +46,7 @@ ADD  R4, R0, R2 ; low words:  R4 = R0 + R2, sets CF
 ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 ```
 
-### Registers in Opcode Format
+### Registers in Opcode Formatting
 | Register | Definition |
 | --- | --- |
 | **`Rd`** | Desination register |
@@ -80,6 +80,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | `PC` | Program Counter (Reserved) |
 | `CF` | Carry Flag Register (Reserved) |
 | `PC_HOLD` | Halt Flag Register (Reserved) |
+| `BUBBLE_FLAG` | Bubble Flag Register (Reserved) |
 
 ### Register Encoding
 | Binary | Register |
@@ -88,9 +89,10 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | N/A - Not addressable | `STK_PTR` |
 | N/A - Not addressable | `PC` / `CF` |
 | N/A - Not addressable | `PC_HOLD` |
+| N/A - Not addressable | `BUBBLE_FLAG` |
 
 ### Notes
-- `STK_PTR`, `PC`, `CF`, `PC_HOLD` are unaccessible and are not referenced by any opcode.
+- `STK_PTR`, `PC`, `CF`, `PC_HOLD`, and `BUBBLE_FLAG` are unaccessible and are not referenced by any opcode.
 
 ## Example Programs
 
@@ -107,15 +109,41 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 
 **Code:**
 ```aasm
-MOVI R0, 5
-MOVI R1, 3
-ADD R2, R0, R1
-STORE R2, R3
-LOAD R4, R3
-HALT
+MOVI  R0, 5       ; store 5 in register 0
+MOVI  R1, 3       ; store 3 in register 1
+ADD   R2, R0, R1  ; add them into register 2
+STORE R2, R3      ; store the result in RAM[0] (R3 currently == 0)
+LOAD  R4, R3      ; load RAM[0] into register 4
+HALT              ; halt the program
 ```
 
 > **Result:** `R2 = 8`, `RAM[0] = 8`, `R4 = 8`.
+
+### Example Program 2
+
+| Addr | AASM | Hex | Binary | Notes |
+| --- | --- | --- | --- | --- |
+| 0 | `MOVI R5, 0` | `7a00` | `0111 1010 0000 0000` | Moves 0 into register 5 |
+| 1 | `BRANCH R5, 5` | `3a05` | `0011 1010 0000 0101` | Branches to 5 if register 5 is 0 |
+| 2 | `MOVI R6, 99` | `7c63` | `0111 1100 0110 0011` | - |
+| 3 | `MOVI R6, 99` | `7c63` | `0111 1100 0110 0011` | - |
+| 4 | `MOVI R6, 99` | `7c63` | `0111 1100 0110 0011` | - |
+| 5 | `MOVI R7, 1` | `7e01` | `0111 1110 0000 0001` | Marker to move 1 into register 7 |
+| 6 | `HALT` | `A000` | `1010 0000 0000 0000` | Halts the program |
+
+**Code:**
+```aasm
+MOVI   R5, 0     ; store 0 in register 5
+BRANCH R5, stop  ; branch to label stop if register 5 is 0
+MOVI   R6, 99    ; trap
+MOVI   R6, 99    ; trap
+MOVI   R6, 99    ; trap
+stop:            ; stop label
+MOVI   R7, 1     ; move 1 into register 7
+HALT             ; halt the program
+```
+
+> **Result:** `R5 = 0`, `R7 = 1`.
 
 ## Compilation / Assembly
 ### Using Icarus Verilog
@@ -129,7 +157,7 @@ HALT
     vvp [destination_name]
     ```
 
-> **Note:** `vvp` must be run with the `.hex` file in the same directory.
+> **Note:** `vvp` must be run with the `.hex` file in the same directory, and the `.hex` file must be named `program.hex` or the string be changed inside `fetch.v` before running `iverilog` and `vvp`.
 
 ### Assembling a `.aasm` File for ROM
 1. Use the compiled assembler in `asm/bin/aasm_assembler.exe` on the command line:
@@ -155,7 +183,6 @@ HALT
 ## Known Assembler / Circuit Caveats:
 - No bounds check on operands.
 - `HALT` pauses `PC` at `PC + 2` instead of the current `PC`.
-- Any `PC`-redirecting instruction (`BRANCH`/`BNE`/`JUMP`/`CALL`/`RETURN`) allows exactly one wrong-path instruction - already in flight when the redirect fires - to execute before the correct target takes over. Not yet fixed in this build.
 
 ## Miscellaneous Notes
 - CPU requires `POR` `RESET` wire held for a fixed number of clock cycles before it fetches instructions.

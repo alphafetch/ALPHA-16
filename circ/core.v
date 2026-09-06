@@ -30,12 +30,21 @@ module Core(
     wire ALU_B_SEL;
     wire RAM_DIN_SEL;
 
+    // Gated wires
+    wire WRITE_GATED = WRITE & ~BUBBLE_FLAG;
+    wire IN_ENABLE_GATED = IN_ENABLE & ~BUBBLE_FLAG;
+    wire INC_GATED = INC & ~BUBBLE_FLAG;
+    wire DEC_GATED = DEC & ~BUBBLE_FLAG;
+    wire CARRY_UPD_GATED = CARRY_UPD & ~BUBBLE_FLAG;
+    wire SH_BRANCH_GATED = SH_BRANCH & ~BUBBLE_FLAG;
+
     reg [15:0] RAM_ADDR;
     reg [15:0] REG_WRITEBACK;
     reg [15:0] ALU_B;
     reg [15:0] RAM_DIN;
     reg CF; // Carry flag
     reg PC_HOLD;
+    reg BUBBLE_FLAG;
 
     always @(*) begin
         case (RAM_ADDR_SEL)
@@ -68,16 +77,19 @@ module Core(
 
     always @(posedge CLK) begin
         if (RESET) CF <= 1'b0;
-        else if (CARRY_UPD) CF <= ALU_COUT;
+        else if (CARRY_UPD_GATED) CF <= ALU_COUT;
 
         if (RESET) PC_HOLD <= 1'b0;
         else if (INSTRUCTION[15:12] == 4'hA) PC_HOLD <= 1'b1;
+
+        if (RESET) BUBBLE_FLAG <= 1'b0;
+        else BUBBLE_FLAG <= SH_BRANCH_GATED;
     end
 
     POR por_inst(.CLK(CLK), .RESET(RESET));
 
     fetch fetch_inst(
-        .CLK(CLK), .PC_CLEAR(RESET), .SH_BRANCH(SH_BRANCH),
+        .CLK(CLK), .PC_CLEAR(RESET), .SH_BRANCH(SH_BRANCH_GATED),
         .IR_CLEAR(RESET), .BRANCH_TGT(BRANCH_TGT_MUX), .PC_HOLD(PC_HOLD),
         .INSTRUCTION(INSTRUCTION), .NEXT_PC(NEXT_PC)
     );
@@ -85,7 +97,7 @@ module Core(
     regFile16 rf_inst(
         .CLK(CLK), .CLEAR(RESET),
         .RADDR1(RADDR1), .RADDR2(RADDR2),
-        .WRITE(WRITE), .WADDR(WADDR), .WDATA(REG_WRITEBACK),
+        .WRITE(WRITE_GATED), .WADDR(WADDR), .WDATA(REG_WRITEBACK),
         .RDATA1(RDATA1), .RDATA2(RDATA2)
     );
 
@@ -96,13 +108,13 @@ module Core(
 
     RAM ram_inst(
         .CLK(CLK), .CLEAR(RESET), .ADDR(RAM_ADDR),
-        .DIN(RAM_DIN), .IN_ENABLE(IN_ENABLE), .OUT_ENABLE(OUT_ENABLE),
+        .DIN(RAM_DIN), .IN_ENABLE(IN_ENABLE_GATED), .OUT_ENABLE(OUT_ENABLE),
         .DOUT(RAM_OUT)
     );
 
     stkPtr stkptr_inst(
         .CLK(CLK), .CLEAR(RESET),
-        .INC(INC), .DEC(DEC), .SP(STK_PTR)
+        .INC(INC_GATED), .DEC(DEC_GATED), .SP(STK_PTR)
     );
 
     controlUnit cu_inst(
