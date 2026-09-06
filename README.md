@@ -7,7 +7,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 - 16-bit data width
 - 16-bit address bus
 - 8 general purpose registers (R0-R7)
-- A set of 9 instructions to utilize in ROM
+- A set of 10 instructions to utilize in ROM
 - 8 different modes for R-type (ALU) instructions
 - 16-bit addressable RAM
 - 8-bit ROM with up to 256 instructions
@@ -25,6 +25,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `0110` | RETURN | - | - | - | - |
 | `0111` | MOVI | `Rd` | `imm[8:6]` | `imm[5:3]` | `imm[2:0]` |
 | `1000` | BNE | `Rcond` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
+| `1001` | NOT | `Rd[11:9]` | `Rs1[8:6]` | - | - |
 
 ### ALU Select (R-type Mnemonic)
 | Value | Operation |

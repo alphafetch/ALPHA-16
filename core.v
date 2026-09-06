@@ -48,6 +48,7 @@ module Core(
             2'b00: REG_WRITEBACK = ALU_RESULT;
             2'b01: REG_WRITEBACK = RAM_OUT;
             2'b10: REG_WRITEBACK = IMMEDIATE;
+            2'b11: REG_WRITEBACK = ~RDATA1;
             default: REG_WRITEBACK = 16'h0000;
         endcase 
 

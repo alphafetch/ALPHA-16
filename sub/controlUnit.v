@@ -117,6 +117,12 @@ module controlUnit(
                     BRANCH_TGT_RAW = {7'b0, INSTRUCTION[8:0]};
                 end
             end
+            4'h9: begin // 1001 NOT
+                RADDR1 = INSTRUCTION[8:6];
+                WADDR = INSTRUCTION[11:9];
+                WRITE = 1'b1;
+                REG_WRITEBACK_SEL = 2'b11;
+            end
             default: ; // 1001, 1010, 1011, 1100, 1101, 1110, 1111 INVALID
         endcase
     end
