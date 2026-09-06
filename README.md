@@ -9,7 +9,8 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 - 8 general purpose registers (R0-R7)
 - A set of 9 instructions to utilize in ROM
 - 7 different modes for R-type (ALU) instructions
-- 16-bit addressable RAM / ROM
+- 16-bit addressable RAM
+- 8-bit ROM with up to 256 instructions
 - Carry flag for 32-bit addition (explained below)
 
 ## ISA
