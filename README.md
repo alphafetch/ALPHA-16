@@ -93,7 +93,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 
 ## Compilation from Source
 ### Using Icarus Verilog
-1. Download Icarus Verilog v12 from [bleyer.org](bleyer.org/icarus/)
+1. Download Icarus Verilog v12 from [bleyer.org/icarus/](bleyer.org/icarus/)
 2. Open your operating system's terminal
 3. Enter the following commands:
 
