@@ -48,6 +48,16 @@ ADD  R4, R0, R2 ; low words:  R4 = R0 + R2, sets CF
 ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 ```
 
+### Registers in Opcode Format
+| Register | Definition |
+| --- | --- |
+| **`Rd`** | Desination register |
+| **`Rs1`** | Source register |
+| **`Rs2`** | Source register |
+| **`Rsrc`** | Source register | 
+| **`Rbase`** | Base address register (`LOAD`/`STORE`) |
+| **`Rcond`** | Conditional reigster (`BRANCH`/`BNE`) |
+
 ### Notes
 - `BRANCH` targets are 9 bits, zero-extended to 16 bits. Taken when `Rcond`'s value is exactly `0`.
     - The same applies for `BNE`, but taken when `Rcond`'s value is not equal to `0`.
