@@ -49,7 +49,8 @@ module controlUnit(
         IMMEDIATE = 16'h0000;
         CARRY_UPD = 1'b0;
         ALU_CIN_SEL = 2'b00;
-        PC_HOLD = 1'b0;
+
+        if (PC_HOLD != 1'b1) PC_HOLD = 1'b0;
 
         case (OPCODE)
             4'h0: begin // 0000 R-type
