@@ -97,8 +97,10 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 2. Open your operating system's terminal
 3. Enter the following commands:
 
-    1. `iverilog -o [destination_name] [path/to/core/core.v] [path/to/sub/dir/alu16.v] [path/to/sub/dir/controlUnit.v] [path/to/sub/dir/fetch.v] [path/to/sub/dir/POR.v] [path/to/sub/dir/RAM.v] [path/to/sub/dir/regFile16.v] [path/to/sub/dir/stkPtr.v]`
-    2. `vvp [destination_name]`
+    ```
+    iverilog -o [destination_name] [path/to/core/core.v] [path/to/sub/dir/alu16.v] [path/to/sub/dir/controlUnit.v] [path/to/sub/dir/fetch.v] [path/to/sub/dir/POR.v] [path/to/sub/dir/RAM.v] [path/to/sub/dir/regFile16.v] [path/to/sub/dir/stkPtr.v]`
+    vvp [destination_name]
+    ```
 
 ## Miscellaneous Notes
 - CPU requires `POR` `RESET` wire held for a fixed number of clock cycles before it fetches instructions.
