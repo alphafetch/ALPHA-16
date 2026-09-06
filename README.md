@@ -28,6 +28,7 @@
 | `011` | OR |
 | `100` | XOR |
 | `101` | ADDC (add w/ carry-flag) |
+| `110` | SHL (bitshift left) |
 
 **Use of ADDC:**
 
@@ -37,10 +38,11 @@ ADD  R4, R0, R2 ; low words:  R4 = R0 + R2, sets CF
 ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 ```
 
-### Notes on Opcodes
+### Notes
 - `BRANCH` target is 9 bits, zero-extended to 16 bits. Taken when `Rcond`'s value is exactly `0`.
 - `JUMP`/`CALL` targets are 12 bits, zero-extended to 16 bits. Both unconditional.
 - `MOVI`'s immediate is 9 bits, zero-extended to 16 bits.
+- `SHL` moves the top bit into `COUT`.
 
 ## Registers
 | Register | Use |
