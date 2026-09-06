@@ -22,11 +22,11 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `0011` | `3xxx` | BRANCH | `Rcond` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
 | `0100` | `4xxx` | JUMP | `target[11:9]` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
 | `0101` | `5xxx` | CALL | `target[11:9]` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
-| `0110` | `6xxx` | RETURN | - | - | - | - |
+| `0110` | `6000` | RETURN | - | - | - | - |
 | `0111` | `7xxx` | MOVI | `Rd` | `imm[8:6]` | `imm[5:3]` | `imm[2:0]` |
 | `1000` | `8xxx` | BNE | `Rcond` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
 | `1001` | `9xxx` | NOT | `Rd[11:9]` | `Rs1[8:6]` | - | - |
-| `1010` | `axxx` | HALT | - | - | - | - |
+| `1010` | `a000` | HALT | - | - | - | - |
 
 ### ALU Select (R-type)
 | Value | Operation |
@@ -105,7 +105,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | 2 | `ADD R2, R0, R1` | `0081` | `0000 0000 1000 0001` | Adds R0 and R1 into R2 |
 | 3 | `STORE R2, R3` | `24c0` | `0010 0100 1100 0000` | Stores R2 into R3 |
 | 4 | `LOAD R4, R3` | `18c0` | `0001 1000 1100 0000` | Loads R3 into R4 |
-| 5 | `HALT` | `A000` | `1010 0000 0000 0000` | Halts the program |
+| 5 | `HALT` | `a000` | `1010 0000 0000 0000` | Halts the program |
 
 **Code:**
 ```aasm
@@ -129,7 +129,7 @@ HALT              ; halt the program
 | 3 | `MOVI R6, 99` | `7c63` | `0111 1100 0110 0011` | - |
 | 4 | `MOVI R6, 99` | `7c63` | `0111 1100 0110 0011` | - |
 | 5 | `MOVI R7, 1` | `7e01` | `0111 1110 0000 0001` | Marker to move 1 into register 7 |
-| 6 | `HALT` | `A000` | `1010 0000 0000 0000` | Halts the program |
+| 6 | `HALT` | `a000` | `1010 0000 0000 0000` | Halts the program |
 
 **Code:**
 ```aasm
@@ -144,6 +144,32 @@ HALT             ; halt the program
 ```
 
 > **Result:** `R5 = 0`, `R7 = 1`.
+
+### Example Program 3
+| Addr | AASM | Hex | Binary | Notes |
+| --- | --- | --- | --- | --- |
+| 0 | `CALL 3` | `5003` | `0101 0000 0000 0011` | Call the subroutine at index 3 |
+| 1 | `MOVI R0, 42` | `702a` | `0111 0000 0010 1010` | Move 42 into register 0 after return |
+| 2 | `HALT` | `a000` | `1010 0000 0000 0000` | Halt the program |
+| 3 | `MOVI R1, 7` | `7207` | `0111 0010 0000 0111` | Subroutine body |
+| 4 | `RETURN` | `6000` | `0110 0000 0000 0000` | Return to caller |
+| 5 | `HALT` | `a000` | `1010 0000 0000 0000` | Catch any bugs and halt |
+
+**Code:**
+```aasm
+CALL sub    ; call the subroutine
+MOVI R0, 42 ; move 42 into register 0 after return
+HALT        ; halt the program
+
+; Subroutines
+sub:        ; subroutine label
+MOVI R1, 7  ; move 7 into register 1
+RETURN      ; return to caller
+
+HALT        ; catch
+```
+
+> **Result:** `R0 = 42`, `R1 = 7`.
 
 ## Compilation / Assembly
 ### Using Icarus Verilog
