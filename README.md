@@ -40,9 +40,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `110` | SHL (bitshift left) |
 | `111` | SHR (bitshift right) |
 
-**Use of ADDC:**
-
-Example usage in ALPHA-16 Assembly:
+Example usage of `ADDC` in ALPHA-16 Assembly (AASM):
 ```asm
 ADD  R4, R0, R2 ; low words:  R4 = R0 + R2, sets CF
 ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
@@ -81,6 +79,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | `STK_PTR` | Stack Pointer Register (Reserved) |
 | `PC` | Program Counter (Reserved) |
 | `CF` | Carry Flag Register (Reserved) |
+| `PC_HOLD` | Halt Flag Register (Reserved) |
 
 ### Register Encoding
 | Binary | Register |
@@ -88,9 +87,10 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | `000` - `111` | `R0` - `R7` |
 | N/A - Not addressable | `STK_PTR` |
 | N/A - Not addressable | `PC` / `CF` |
+| N/A - Not addressable | `PC_HOLD` |
 
 ### Notes
-- `STK_PTR`, `PC`, and `CF` are unaccessible and are not referenced by any opcode.
+- `STK_PTR`, `PC`, `CF`, `PC_HOLD` are unaccessible and are not referenced by any opcode.
 
 ## Example Programs
 
@@ -104,6 +104,16 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | 3 | `STORE R2, R3` | `24c0` | `0010 0100 1100 0000` | Stores R2 into R3 |
 | 4 | `LOAD R4, R3` | `18c0` | `0001 1000 1100 0000` | Loads R3 into R4 |
 | 5 | `HALT` | `A000` | `1010 0000 0000 0000` | Halts the program |
+
+**Code:**
+```aasm
+MOVI R0, 5
+MOVI R1, 3
+ADD R2, R0, R1
+STORE R2, R3
+LOAD R4, R3
+HALT
+```
 
 > **Result:** `R2 = 8`, `RAM[0] = 8`, `R4 = 8`.
 
@@ -131,8 +141,21 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 2. If you used a custom filename for the output `.hex` file, enter it into `circ/sub/fetch.v` on line 17 in the string input field (defaults to `program.hex`, enter no second argument to use `program.hex` as the output file from the `aasm_assembler`).
 3. Run the above compilation instructions for Icarus Verilog to compile and run the circuit.
 
-#### Known Assembler Caveats:
-- No bounds check on operands
+### Compiling the Assembler
+1. Install `g++` from the `MSYS2` ([msys2.org](msys2.org)) terminal.
+
+    1. Install the `MSYS2` terminal from the provided website.
+    2. Open it and run `pacman -S mingw-w64-x86_64-toolchain`.
+2. Open Microsoft PowerShell and run the following command in the output directory (also containing the `src` folder):
+
+    ```
+    g++ -o aasm_assembler.exe src/assembler.cpp src/core/mnemonics.cpp src/core/prexecute.cpp src/core/encode.cpp src/utils/utils.cpp
+    ```
+
+## Known Assembler / Circuit Caveats:
+- No bounds check on operands.
+- `HALT` pauses `PC` at `PC + 2` instead of the current `PC`.
+- Any `PC`-redirecting instruction (`BRANCH`/`BNE`/`JUMP`/`CALL`/`RETURN`) allows exactly one wrong-path instruction - already in flight when the redirect fires - to execute before the correct target takes over. Not yet fixed in this build.
 
 ## Miscellaneous Notes
 - CPU requires `POR` `RESET` wire held for a fixed number of clock cycles before it fetches instructions.

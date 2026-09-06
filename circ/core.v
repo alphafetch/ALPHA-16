@@ -29,13 +29,13 @@ module Core(
     wire [1:0] REG_WRITEBACK_SEL;
     wire ALU_B_SEL;
     wire RAM_DIN_SEL;
-    wire PC_HOLD;
 
     reg [15:0] RAM_ADDR;
     reg [15:0] REG_WRITEBACK;
     reg [15:0] ALU_B;
     reg [15:0] RAM_DIN;
     reg CF; // Carry flag
+    reg PC_HOLD;
 
     always @(*) begin
         case (RAM_ADDR_SEL)
@@ -69,6 +69,9 @@ module Core(
     always @(posedge CLK) begin
         if (RESET) CF <= 1'b0;
         else if (CARRY_UPD) CF <= ALU_COUT;
+
+        if (RESET) PC_HOLD <= 1'b0;
+        else if (INSTRUCTION[15:12] == 4'hA) PC_HOLD <= 1'b1;
     end
 
     POR por_inst(.CLK(CLK), .RESET(RESET));
@@ -111,7 +114,7 @@ module Core(
         .ALU_B_SEL(ALU_B_SEL), .IN_ENABLE(IN_ENABLE), .OUT_ENABLE(OUT_ENABLE),
         .RAM_ADDR_SEL(RAM_ADDR_SEL), .RAM_DIN_SEL(RAM_DIN_SEL), .INC(INC),
         .DEC(DEC), .IMMEDIATE(IMMEDIATE), .CARRY_UPD(CARRY_UPD),
-        .ALU_CIN_SEL(ALU_CIN_SEL), .PC_HOLD(PC_HOLD)
+        .ALU_CIN_SEL(ALU_CIN_SEL)
     );
 
     assign BRANCH_TGT_MUX = RET ? RAM_OUT : BRANCH_TGT_RAW;
