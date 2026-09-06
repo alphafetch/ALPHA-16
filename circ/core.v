@@ -80,7 +80,7 @@ module Core(
         else if (CARRY_UPD_GATED) CF <= ALU_COUT;
 
         if (RESET) PC_HOLD <= 1'b0;
-        else if (INSTRUCTION[15:12] == 4'hA) PC_HOLD <= 1'b1;
+        else if (INSTRUCTION[15:12] == 4'hA && !BUBBLE_FLAG) PC_HOLD <= 1'b1;
 
         if (RESET) BUBBLE_FLAG <= 1'b0;
         else BUBBLE_FLAG <= SH_BRANCH_GATED;
