@@ -128,7 +128,7 @@ module controlUnit(
             4'hA: begin // 1010 HALT
                 PC_HOLD = 1'b1;
             end
-            default: ; // 1001, 1010, 1011, 1100, 1101, 1110, 1111 INVALID
+            default: ; // 1011, 1100, 1101, 1110, 1111 INVALID
         endcase
     end
 endmodule
