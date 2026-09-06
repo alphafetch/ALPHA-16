@@ -13,8 +13,8 @@ module fetch(
     reg [7:0] PC;
     reg [15:0] ROM [0:255];
 
-    // In parent directory, file `program.hex`
-    initial $readmemh("../program.hex", ROM); 
+    // File `program.hex` in directory that it is run from
+    initial $readmemh("./program.hex", ROM); 
 
     always @(posedge CLK) begin
         if (PC_CLEAR) begin
