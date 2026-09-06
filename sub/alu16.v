@@ -14,6 +14,7 @@ module alu16(
             3'b010: {COUT, RESULT} = A & B + 0;
             3'b011: {COUT, RESULT} = A | B + 0;
             3'b100: {COUT, RESULT} = A ^ B + 0;
+            3'b101: {COUT, RESULT} = A + B + CIN;
             default: RESULT = 16'h0000;
         endcase
     end

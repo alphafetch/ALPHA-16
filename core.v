@@ -8,6 +8,8 @@ module Core(
     wire [15:0] RDATA1, RDATA2;
     wire [15:0] ALU_RESULT;
     wire ALU_COUT;
+    wire [1:0] ALU_CIN_SEL;
+    wire ALU_CIN = (ALU_CIN_SEL == 2'b10) ? CF : (ALU_CIN_SEL == 2'b01) ? 1'b1 : 1'b0;
     wire [15:0] RAM_OUT;
     wire [15:0] STK_PTR;
     wire RET;
@@ -32,6 +34,7 @@ module Core(
     reg [15:0] REG_WRITEBACK;
     reg [15:0] ALU_B;
     reg [15:0] RAM_DIN;
+    reg CF; // Carry flag
 
     always @(*) begin
         case (RAM_ADDR_SEL)
@@ -61,6 +64,11 @@ module Core(
         endcase 
     end
 
+    always @(posedge CLK) begin
+        if (RESET) CF <= 1'b0;
+        else if (CARRY_UPD) CF <= ALU_COUT;
+    end
+
     POR por_inst(.CLK(CLK), .RESET(RESET));
 
     fetch fetch_inst(
@@ -78,7 +86,7 @@ module Core(
 
     alu16 alu_inst(
         .A(RDATA1), .B(ALU_B), .SEL(SEL),
-        .CIN(1'b0), .RESULT(ALU_RESULT), .COUT(ALU_COUT)
+        .CIN(ALU_CIN), .RESULT(ALU_RESULT), .COUT(ALU_COUT)
     );
 
     RAM ram_inst(
@@ -100,7 +108,8 @@ module Core(
         .WADDR(WADDR), .REG_WRITEBACK_SEL(REG_WRITEBACK_SEL), .SEL(SEL),
         .ALU_B_SEL(ALU_B_SEL), .IN_ENABLE(IN_ENABLE), .OUT_ENABLE(OUT_ENABLE),
         .RAM_ADDR_SEL(RAM_ADDR_SEL), .RAM_DIN_SEL(RAM_DIN_SEL), .INC(INC),
-        .DEC(DEC), .IMMEDIATE(IMMEDIATE)
+        .DEC(DEC), .IMMEDIATE(IMMEDIATE), .CARRY_UPD(CARRY_UPD),
+        .ALU_CIN_SEL(ALU_CIN_SEL)
     );
 
     assign BRANCH_TGT_MUX = RET ? RAM_OUT : BRANCH_TGT_RAW;

@@ -19,7 +19,9 @@ module controlUnit(
     output reg RAM_DIN_SEL,
     output reg INC,
     output reg DEC,
-    output reg [15:0] IMMEDIATE
+    output reg [15:0] IMMEDIATE,
+    output reg CARRY_UPD,
+    output reg [1:0] ALU_CIN_SEL
 );
     wire [3:0] OPCODE = INSTRUCTION[15:12];
     reg [3:0] Rbase;
@@ -44,6 +46,8 @@ module controlUnit(
         INC = 1'b0;
         DEC = 1'b0;
         IMMEDIATE = 16'h0000;
+        CARRY_UPD = 1'b0;
+        ALU_CIN_SEL = 2'b00;
 
         case (OPCODE)
             4'h0: begin // 0000 R-type
@@ -54,6 +58,10 @@ module controlUnit(
                 WRITE = 1'b1; // Write to a register
                 WADDR = INSTRUCTION[8:6]; // Register address to write to
                 REG_WRITEBACK_SEL = 2'b00; // Selector to write back
+                CARRY_UPD = (INSTRUCTION[11:9] == 3'b000) || (INSTRUCTION[11:9] == 3'b101);
+                if (INSTRUCTION[11:9] == 3'b101) ALU_CIN_SEL = 2'b10; // ADDC -> CF
+                else if (INSTRUCTION[11:9] == 3'b001) ALU_CIN_SEL = 2'b01; // SUB -> 1
+                else ALU_CIN_SEL = 2'b00; // All else -> 0
             end
             4'h1: begin // 0001 LOAD
                 RADDR1 = INSTRUCTION[8:6]; // Address to load from

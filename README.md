@@ -5,6 +5,7 @@
 - 8 general purpose registers (R0-R7)
 - A set of 8 instructions to utilize in ROM
 - Harvard architecture with ROM and RAM
+- Carry flag for 32-bit addition
 
 ## ISA
 | Opcode | Mnemonic | [11:9] | [8:6] | [5:3] | [2:0] |
@@ -31,6 +32,7 @@
 | `R7` | General Purpose (Available) |
 | `STK_PTR` | Stack Pointer Register (Reserved) |
 | `PC` | Program Counter (Reserved) |
+| `CF` | Carry Flag Register (Reserved) |
 
 ## Compilation from Source
 ### Using Icarus Verilog
