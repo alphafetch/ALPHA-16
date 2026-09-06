@@ -110,7 +110,14 @@ module controlUnit(
                 WRITE = 1'b1; // Enable write
                 REG_WRITEBACK_SEL = 2'b10; // Set the write mode
             end
-            default: ; // 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111 INVALID
+            4'h8: begin // 1000 BNE
+                RADDR1 = INSTRUCTION[11:9];
+                if (RDATA1 != 16'h0000) begin
+                    SH_BRANCH = 1'b1;
+                    BRANCH_TGT_RAW = {7'b0, INSTRUCTION[8:0]};
+                end
+            end
+            default: ; // 1001, 1010, 1011, 1100, 1101, 1110, 1111 INVALID
         endcase
     end
 endmodule
