@@ -208,7 +208,7 @@ HALT        ; catch
 
 ## Known Assembler / Circuit Caveats:
 - No bounds check on operands.
-- `HALT` pauses `PC` at `PC + 2` instead of the current `PC`.
+- `HALT` freezes execution two addresses after its own position in ROM, due to the fetch pipeline's one-instruction lookahead plus `PC_HOLD`'s own registration delay - confirmed consistent across straight line, branching, and `CALL`/`RETURN` programs.
 
 ## Miscellaneous Notes
 - CPU requires `POR` `RESET` wire held for a fixed number of clock cycles before it fetches instructions.
