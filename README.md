@@ -26,7 +26,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `0111` | `7xxx` | MOVI | `Rd` | `imm[8:6]` | `imm[5:3]` | `imm[2:0]` |
 | `1000` | `8xxx` | BNE | `Rcond` | `target[8:6]` | `target[5:3]` | `target[2:0]` |
 | `1001` | `9xxx` | NOT | `Rd[11:9]` | `Rs1[8:6]` | - | - |
-| `1010` | `Axxx` | HALT | - | - | - | - |
+| `1010` | `axxx` | HALT | - | - | - | - |
 
 ### ALU Select (R-type)
 | Value | Operation |
@@ -105,7 +105,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 | 4 | `LOAD R4, R3` | `18c0` | `0001 1000 1100 0000` | Loads R3 into R4 |
 | 5 | `HALT` | `A000` | `1010 0000 0000 0000` | Halts the program |
 
-**Result:** `R2 = 8`, `RAM[0] = 8`, `R4 = 8`.
+> **Result:** `R2 = 8`, `RAM[0] = 8`, `R4 = 8`.
 
 ## Compilation / Assembly
 ### Using Icarus Verilog
@@ -118,6 +118,8 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 
     vvp [destination_name]
     ```
+
+> **Note:** `vvp` must be run with the `.hex` file in the same directory.
 
 ### Assembling a `.aasm` File for ROM
 1. Use the compiled assembler in `asm/bin/aasm_assembler.exe` on the command line:
