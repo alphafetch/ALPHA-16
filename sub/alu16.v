@@ -16,6 +16,7 @@ module alu16(
             3'b100: {COUT, RESULT} = A ^ B + 0;
             3'b101: {COUT, RESULT} = A + B + CIN;
             3'b110: {COUT, RESULT} = {A[15], A[14:0], 1'b0}; // COUT = top bit
+            3'b111: {COUT, RESULT} = {A[0], 1'b0, A[15:1]}; // COUT = lower bit
             default: RESULT = 16'h0000;
         endcase
     end

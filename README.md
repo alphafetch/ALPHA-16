@@ -8,7 +8,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 - 16-bit address bus
 - 8 general purpose registers (R0-R7)
 - A set of 9 instructions to utilize in ROM
-- 7 different modes for R-type (ALU) instructions
+- 8 different modes for R-type (ALU) instructions
 - 16-bit addressable RAM
 - 8-bit ROM with up to 256 instructions
 - Carry flag for 32-bit addition (explained below)
@@ -36,6 +36,7 @@ The Alpha-16 is a small x16 CPU designed loosely off of the LC-3 (Little Compute
 | `100` | XOR |
 | `101` | ADDC (add w/ carry-flag) |
 | `110` | SHL (bitshift left) |
+| `111` | SHR (bitshift right) |
 
 **Use of ADDC:**
 
@@ -51,6 +52,7 @@ ADDC R5, R1, R3 ; high words: R5 = R1 + R3 + CF
 - `JUMP`/`CALL` targets are 12 bits, zero-extended to 16 bits. Both unconditional.
 - `MOVI`'s immediate is 9 bits, zero-extended to 16 bits.
 - `SHL` moves the top bit into `COUT`.
+- `SHR` moves the lower bit into `COUT`.
 
 ## Registers
 | Register | Use |
