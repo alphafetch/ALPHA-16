@@ -171,6 +171,43 @@ HALT        ; catch
 
 > **Result:** `R0 = 42`, `R1 = 7`.
 
+### Example Program 4
+| Addr | AASM | Hex | Binary | Notes |
+| --- | --- | --- | --- | --- |
+| 0 | `MOVI R0, 5` | `7005` | `0111 0000 0000 0101` | Move 5 into register 0 |
+| 1 | `MOVI R1, 3` | `7103` | `0111 0001 0000 0010` | Move 3 into register 1
+| 2 | `SUB R2, R0, R1` | `0281` | `0000 0010 1000 0001` | Subtract R1 from R0 into R2 |
+| 3 | `AND R3, R0, R1` | `04c1` | `0000 0100 1100 0001` | And R0 and R1 into R3 |
+| 4 | `OR R4, R0, R1` | `0701` | `0000 0111 0000 0001` | Or R0 and R1 into R4 |
+| 5 | `XOR R5, R0, R1` | `0941` | `0000 1001 0100 0001` | Xor R0 and R1 into R5 |
+| 6 | `ADDC R6, R0, R1` | `0b81` | `0000 1011 1000 0001` | Add with carry R0 and R1 into R6 |
+| 7 | `NOT R7, R0` | `9e00` | `1001 1110 0000 0000` | Not R0 into R7 |
+| 8 | `BNE R2, 10` | `840a` | `1000 0100 0000 1010` | Branch to 10 if R2 is not 0 |
+| 9 | `MOVI R7, 99` | `7e63` | `0111 1110 0110 0011` | Move 99 into R7 (trap) |
+| 10 | `SHL R0, R0, R0` | `0c00` | `0000 1100 0000 0000` | Shift R0 left |
+| 11 | `SHR R1, R1, R1` | `0e49` | `0000 1110 0100 1001` | Shift R1 right |
+| 12 | `HALT` | `a000` | `1010 0000 0000 0000` | Halt the program |
+
+**Code:**
+```aasm
+MOVI R0, 5      ; move 5 into R0
+MOVI R1, 3      ; move 3 into R1
+SUB  R2, R0, R1 ; R0 - R1 -> R2
+AND  R3, R0, R1 ; R0 & R1 -> R3
+OR   R4, R0, R1 ; R0 | R1 -> R4
+XOR  R5, R0, R1 ; R0 ^ R1 -> R5
+ADDC R6, R0, R1 ; R0 + R1 + CIN -> R6
+NOT  R7, R0     ; ~R0 -> R7
+BNE  R2, skip   ; If R2 != 0 go to skip 
+MOVI R7, 99     ; trap
+skip:
+SHL  R0, R0, R0 ; shift R0 left one bit
+SHR  R1, R1, R1 ; shift R1 right one bit
+HALT            ; halt the program
+```
+
+> **Result:** `R0 = 0x000A`, `R1 = 0x0001`, `R2 = 0x0002`, `R3 = 0x0001`, `R4 = 0x0007`, `R5 = 0x0006`, `R6 = 0x0008`, `R7 = 0xFFFA`.
+
 ## Compilation / Assembly
 ### Using Icarus Verilog
 1. Download Icarus Verilog v14 from [bleyer.org/icarus/](https://www.bleyer.org/icarus/)
@@ -207,8 +244,9 @@ HALT        ; catch
     ```
 
 ## Known Assembler / Circuit Caveats:
-- No bounds check on operands.
+- No bounds check on operands (ex. `ADD R5, R4` is not checked, even though it is invalid syntax).
 - `HALT` freezes execution two addresses after its own position in ROM, due to the fetch pipeline's one-instruction lookahead plus `PC_HOLD`'s own registration delay - confirmed consistent across straight line, branching, and `CALL`/`RETURN` programs.
+- `STORE` does not take immedate values (ex. `STORE R5, R4` works, and stores the value in R5 to RAM[R4], and does not take immediate values for either, so `STORE 5, 4` would not store `5` to RAM slot `4`).
 
 ## Miscellaneous Notes
 - CPU requires `POR` `RESET` wire held for a fixed number of clock cycles before it fetches instructions.
